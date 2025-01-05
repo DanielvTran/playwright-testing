@@ -26,8 +26,11 @@ test("should make sure that articles are sorted based on newest article", async 
     // Add new timeStamps to main array
     timeStamps = [...timeStamps, ...newTimestamps];
 
+    // Convert timestamps to a more readable format
+    const readableTimeStamps = timeStamps.map((ts) => ts.toLocaleString());
+
     // See how many timeStamps have been added
-    console.log(`Loaded ${timeStamps.length} articles`);
+    console.log(`Time Stamps at ${timeStamps.length}:`, readableTimeStamps);
 
     // Get next page of articles
     if (timeStamps.length < 100) {
@@ -52,6 +55,10 @@ test("should make sure that articles are sorted based on newest article", async 
     }
   }
 
+  // Convert timestamps to a more readable format
+  const readableTimeStamps = timeStamps.map((ts) => ts.toLocaleString());
+
+  console.log(`Time Stamps at ${timeStamps.length}:`, readableTimeStamps);
   expect(isSorted).toBe(true); // Assert that timeStamps are sorted from newest to oldest
 });
 
@@ -72,12 +79,13 @@ test("should make sure that articles ranks are unique", async ({ page }) => {
     articleRanks = [...articleRanks, ...newRanks];
 
     // See how many articles have been added
-    console.log(`Loaded ${articleRanks.length} article ranks`);
+    console.log(`Loaded ${articleRanks.length} article ranks:`, articleRanks);
 
     // Get next page of articleRanks
     if (articleRanks.length < 100) {
       const moreLink = page.locator(".morelink");
       await moreLink.click();
+      await page.waitForLoadState("load", { timeout: 10000 }); // Wait for the page to load
     }
 
     // Trim to exactly 100 articleRanks if we got more
@@ -90,7 +98,8 @@ test("should make sure that articles ranks are unique", async ({ page }) => {
   // Validate that all ranks are unique
   const isUnique = uniqueRanks.size === articleRanks.length;
 
-  console.log(articleRanks);
+  // See how many articles have been added
+  console.log(`Loaded ${articleRanks.length} article ranks:`, articleRanks);
 
   expect(isUnique).toBe(true); // Assert that article ranks are unique
 });
@@ -123,6 +132,9 @@ test("should redirect to user profile when author is clicked", async ({ page }) 
   // Get the user name
   const userName = await userLink.innerText();
 
+  console.log("Author Name on articles page:", authorName);
+  console.log("Author Name on author page:", userName);
+
   // Validate user
   expect(userName).toBe(authorName);
 });
@@ -130,6 +142,12 @@ test("should redirect to user profile when author is clicked", async ({ page }) 
 test("should redirect to comment section of article when timestamp is clicked", async ({ page }) => {
   // Go to Hacker News
   await page.goto(testPageUrl);
+
+  // Locate article locator
+  const articleName = page.locator(".titleline").first();
+
+  // Get article name
+  const articleTitle = await articleName.innerText();
 
   // Locate the timestamp element
   const timestampElement = page.locator(".age").first();
@@ -146,14 +164,27 @@ test("should redirect to comment section of article when timestamp is clicked", 
   // Wait for the page to load
   await page.waitForLoadState("load");
 
+  // Locate the article title on new page
+  const newArticleName = page.locator(".titleline").first();
+
+  // Get article name
+  const newArticleTitle = await newArticleName.innerText();
+
   // Validate the URL
   expect(page.url()).toBe(`https://news.ycombinator.com/${href}`);
+  console.log(`Url before clicking on timestamp: https://news.ycombinator.com/${href}`);
+  console.log(`Url after clicking on timestamp: ${page.url()}`);
 
   // Get add to comment to confirm on the right page
   const addCommentButton = page.locator('input[type="submit"][value="add comment"]');
 
   // Make sure that there is an add comment button
   await expect(addCommentButton).toHaveAttribute("value", "add comment");
+
+  // Make sure that the article title is the same
+  expect(newArticleTitle).toBe(articleTitle);
+  console.log(`Article title before clicking on timestamp: ${articleTitle}`);
+  console.log(`Article title after clicking on timestamp: ${newArticleTitle}`);
 });
 
 test("should redirect to comment section of article when discuss is clicked", async ({ page }) => {
@@ -174,50 +205,12 @@ test("should redirect to comment section of article when discuss is clicked", as
 
   // Validate the URL
   expect(page.url()).toBe(`https://news.ycombinator.com/${href}`);
+  console.log(`Url before clicking on discuss: https://news.ycombinator.com/${href}`);
+  console.log(`Url after clicking on discuss: ${page.url()}`);
 
   // Get add to comment to confirm on the right page
   const addCommentButton = page.locator('input[type="submit"][value="add comment"]');
 
   // Make sure that there is an add comment button
   await expect(addCommentButton).toHaveAttribute("value", "add comment");
-});
-
-test("should redirect to article site when article title is clicked", async ({ page }) => {
-  // Go to Hacker News newest section
-  await page.goto(testPageUrl);
-
-  // Locate the newest title span
-  const newestTitleSpan = page.locator(".titleline");
-
-  // Locate the title link
-  const titleLink = newestTitleSpan.locator("a").first();
-
-  // Locate the title name
-  const titleName = await titleLink.locator("span").first().innerText();
-
-  // Get the href value which contains the link to the article
-  const articleHref = await titleLink.getAttribute("href");
-
-  // Click the job link
-  await titleLink.click();
-
-  // Wait for the page to load
-  await page.waitForLoadState("load");
-
-  // Validate the URL
-  expect(page.url()).toBe(`https://news.ycombinator.com/${jobHref}`);
-
-  // CHECK THAT JOB ADS ARE FROM THE CORRECT COMPANY
-  // Locate all of the jobs from the company
-  const jobsFromCompany = page.locator(".titleline .sitebit.comhead a");
-
-  // Get the count of jobs from the company
-  const count = await jobsFromCompany.count();
-
-  // Validate that all jobs are from the correct company
-  for (let i = 0; i < count; i++) {
-    const job = jobsFromCompany.nth(i);
-    const jobCompany = await job.innerText();
-    expect(jobCompany).toBe(companyName);
-  }
 });

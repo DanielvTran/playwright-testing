@@ -26,7 +26,7 @@ test("should make sure that all nav links are black on main page", async ({ page
     const linkColor = await link.evaluate((element) => {
       return getComputedStyle(element).color;
     });
-    expect(linkColor).toBe("rgb(0, 0, 0)"); // Assuming black color is represented as 'rgb(0, 0, 0)'
+    expect(linkColor).toBe("rgb(0, 0, 0)");
   }
 });
 
