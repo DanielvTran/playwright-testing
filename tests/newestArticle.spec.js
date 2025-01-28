@@ -1,4 +1,3 @@
-// EDIT THIS FILE TO COMPLETE ASSIGNMENT QUESTION 1
 const { expect, test } = require("playwright/test");
 const { verifyPageUrl } = require("../lib/utils");
 

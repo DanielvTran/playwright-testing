@@ -1,4 +1,3 @@
-// EDIT THIS FILE TO COMPLETE ASSIGNMENT QUESTION 1
 const { expect, test } = require("playwright/test");
 const { verifyPageUrl } = require("../lib/utils");
 
@@ -117,12 +116,6 @@ test("should redirect to reply section of comment when timestamp is clicked", as
 
   // Validate the URL
   expect(page.url()).toBe(`https://news.ycombinator.com/${href}`);
-
-  // Locate the comment container element
-  const testCommentContainerElement = page.locator(".comment").first();
-
-  // Locate the comment element
-  const testCommentElement = commentContainerElement.locator("div").first();
 
   // Get the comment text
   const testCommentText = await commentElement.innerText();

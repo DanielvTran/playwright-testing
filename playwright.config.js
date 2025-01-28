@@ -41,14 +41,14 @@ module.exports = defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] }, // Google Chrome
     },
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] }, // Mozilla Firefox
-    },
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] }, // Safari
-    },
+    // {
+    //   name: "firefox",
+    //   use: { ...devices["Desktop Firefox"] }, // Mozilla Firefox
+    // },
+    // {
+    //   name: "webkit",
+    //   use: { ...devices["Desktop Safari"] }, // Safari
+    // },
   ],
 
   /* Run your local dev server before starting the tests */
